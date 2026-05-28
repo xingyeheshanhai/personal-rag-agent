@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from pathlib import Path
 
 import fitz
@@ -8,23 +9,36 @@ class UnsupportedDocumentTypeError(ValueError):
     pass
 
 
-def load_document_text(file_path: str | Path) -> str:
+@dataclass(frozen=True)
+class DocumentPage:
+    page_number: int
+    text: str
+
+
+def load_document_pages(file_path: str | Path) -> list[DocumentPage]:
     path = Path(file_path)
     suffix = path.suffix.lower()
 
     if suffix == ".pdf":
-        return _load_pdf_text(path)
+        return _load_pdf_pages(path)
     if suffix == ".docx":
-        return _load_docx_text(path)
-    if suffix in {".txt", ".md"}:
-        return path.read_text(encoding="utf-8")
+        return [DocumentPage(page_number=1, text=_load_docx_text(path))]
+    if suffix in {".txt", ".md", ".markdown"}:
+        return [DocumentPage(page_number=1, text=path.read_text(encoding="utf-8"))]
 
     raise UnsupportedDocumentTypeError(f"Unsupported document type: {suffix}")
 
 
-def _load_pdf_text(path: Path) -> str:
+def load_document_text(file_path: str | Path) -> str:
+    return "\n".join(page.text for page in load_document_pages(file_path))
+
+
+def _load_pdf_pages(path: Path) -> list[DocumentPage]:
     with fitz.open(path) as document:
-        return "\n".join(page.get_text() for page in document)
+        return [
+            DocumentPage(page_number=index + 1, text=page.get_text())
+            for index, page in enumerate(document)
+        ]
 
 
 def _load_docx_text(path: Path) -> str:

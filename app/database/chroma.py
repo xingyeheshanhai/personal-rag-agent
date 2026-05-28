@@ -1,11 +1,15 @@
 import chromadb
 from chromadb.api import ClientAPI
+from chromadb.config import Settings
 
 from app.core.config import settings
 
 
 def get_chroma_client() -> ClientAPI:
-    return chromadb.PersistentClient(path=settings.chroma_persist_directory)
+    return chromadb.PersistentClient(
+        path=settings.chroma_persist_directory,
+        settings=Settings(anonymized_telemetry=False),
+    )
 
 
 def get_default_collection():

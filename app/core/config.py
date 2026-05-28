@@ -13,8 +13,11 @@ class Settings(BaseSettings):
     deepseek_base_url: str = "https://api.deepseek.com"
     deepseek_model: str = "deepseek-chat"
 
-    chroma_persist_directory: str = ".chroma"
+    chroma_persist_directory: str = "backend/vector_db"
     chroma_collection_name: str = "personal_knowledge_base"
+
+    upload_directory: str = "backend/uploads"
+    max_upload_size_bytes: int = 20 * 1024 * 1024
 
     model_config = SettingsConfigDict(
         env_file=".env",
