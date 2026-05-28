@@ -65,6 +65,12 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
+On Windows with Python 3.12, if Chroma's default `chroma-hnswlib` wheel crashes during vector writes, reinstall the verified wheel:
+
+```bash
+pip install --force-reinstall --no-deps chroma-hnswlib==0.7.5
+```
+
 ## Environment Variables
 
 Copy the example environment file:
